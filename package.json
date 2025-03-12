@@ -5,7 +5,14 @@
   "scripts": {
     "start": "ts-node src/server.ts",
     "dev": "nodemon src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sequelize-cli": "ts-node -r tsconfig-paths/register ./node_modules/sequelize-cli/lib/sequelize",
+    "migrate": "npm run sequelize-cli db:migrate",
+    "migrate:undo": "npm run sequelize-cli db:migrate:undo",
+    "migrate:redo": "npm run migrate:undo && npm run migrate",
+    "migrate:status": "npm run sequelize-cli db:migrate:status",
+    "seed": "npm run sequelize-cli db:seed:all",
+    "seed:undo": "npm run sequelize-cli db:seed:undo:all"
   },
   "keywords": [],
   "author": "",
@@ -30,7 +37,9 @@
     "@types/pg": "^8.11.11",
     "@types/sequelize": "^4.28.20",
     "nodemon": "^3.1.9",
+    "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.2"
   }
 }
