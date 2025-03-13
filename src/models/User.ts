@@ -7,6 +7,8 @@ interface UserAttributes {
     name: string;
     email: string;
     password: string;
+    resetToken?: string | null;
+    resetTokenExpires?: Date | null;
 }
 
 // optional interface for create action
@@ -18,6 +20,8 @@ class User extends Model<UserAttributes, UserCreateAttributes> implements UserAt
     public name!: string;
     public email!: string;
     public password!: string;
+    public resetToken?: string | null;
+    public resetTokenExpires?: Date | null;
 }
 
 // define table structure
@@ -40,7 +44,15 @@ User.init(
         password: {
             type: DataTypes.STRING,
             allowNull: false
-        }
+        },
+        resetToken: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        resetTokenExpires: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
     },
     {
         sequelize,
