@@ -3,6 +3,7 @@ import User from '../models/User';
 import jwt from "jsonwebtoken";
 import bcrypt from 'bcryptjs';
 import transporter from '../config/mail';
+import { resetPasswordTemplate } from "../templates/resetPasswordTemplate";
 
 /**
  * register user
@@ -110,17 +111,62 @@ export const forgotPassword = async (req: Request, res: Response) => {
     user.resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
     await user.save();
 
+    // create reset link
+    const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
+
     // sending email
     const responseEmail = await transporter.sendMail({
         from: `"Super Dev" <${process.env.MAIL_FROM}>`,
         replyTo: `"Super Dev" <superdev@gmail.com>`,
         to: email,
-        subject: `Test SMTP`,
-        text: 'Test message'
+        subject: `Super Dev - Reset Password`,
+        html: resetPasswordTemplate(resetLink)
     });
 
     res.status(200).json({
         message: 'Silahkan cek email anda untuk mengganti password',
         response: responseEmail
     });
+};
+
+/**
+ * Route for reset password
+ * 
+ * @return json
+ */
+export const resetPassword = async (req: Request, res: Response) => {
+    const {token, password} = req.body;
+
+    try {
+        // verify token
+        const decoded = jwt.verify(token as string, process.env.JWT_SECRET as string) as { id: number };
+
+        // find user with matching token
+        const user = await User.findOne({
+            where: {
+                id: decoded.id,
+                resetToken: token
+            }
+        });
+
+        if (!user || (user.resetTokenExpires?.getTime() ?? 0) < Date.now()) {
+            res.status(400).json({
+                message: 'Invalid or expired token'
+            });
+            return;
+        }
+
+        // update password
+        user.password = await bcrypt.hash(password, 10);
+        user.resetToken = null;
+        user.resetTokenExpires = null;
+        await user.save();
+
+        res.status(200).json({ message: "Password has been reset successfully" });
+    }
+    catch(e) {
+        res.status(400).json({
+            message: 'Invalid Token'
+        });
+    }
 };
