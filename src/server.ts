@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import orderRoutes from "./routes/order";
 import authRoutes from "./routes/auth";
+import productRoutes from "./routes/product";
 import sequelize from "./config/database";
 
 dotenv.config();
@@ -14,6 +15,7 @@ app.use(cors());
 // register all routes into app
 app.use('/order', orderRoutes);
 app.use('/auth', authRoutes);
+app.use('/product', productRoutes);
 
 
 const port = process.env.PORT || 3000;
