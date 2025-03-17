@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import orderRoutes from "./routes/order";
 import authRoutes from "./routes/auth";
 import productRoutes from "./routes/product";
@@ -11,6 +12,9 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+// serve static uploaded file via URL
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // register all routes into app
 app.use('/order', orderRoutes);
