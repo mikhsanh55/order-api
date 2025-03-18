@@ -1,13 +1,14 @@
 import { Router } from "express";
 import {productIndex, productShow, productStore, productUpdate} from '../controllers/productController';
 import { upload } from '../middlewares/upload';
+import { authenticate } from "../middlewares/auth";
 
 const router = Router();    
 
 // define route for all order
-router.get('/', productIndex);
-router.get('/:id', productShow);
-router.post('/', upload.single('image'), productStore);
-router.put('/:id', upload.single('image'), productUpdate);
+router.get('/', authenticate, productIndex);
+router.get('/:id', authenticate, productShow);
+router.post('/', [authenticate, upload.single('image')], productStore);
+router.put('/:id', [authenticate, upload.single('image')], productUpdate);
 
 export default router;
